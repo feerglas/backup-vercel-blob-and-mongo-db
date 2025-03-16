@@ -2,10 +2,10 @@
 // - integrity check: after backup, count objects in db and in backup
 // - log amount of objects
 
-import { S3Helper } from '../helpers/s3.js';
-import { DbHelper } from '../helpers/db.js';
-import { dateString } from '../helpers/date.js';
-import config from '../config.js';
+import { S3Helper } from '../helpers/s3.ts';
+import { DbHelper } from '../helpers/db.ts';
+import { dateString } from '../helpers/date.ts';
+import config from '../config.ts';
 
 export default async (dbName) => {
   const dbHelper = new DbHelper();

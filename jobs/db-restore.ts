@@ -4,10 +4,10 @@
 // - if backup is found: make interactive cli, ask if user is really sure
 // that he wants to delete all data and restore from backup
 
-import { S3Helper } from '../helpers/s3.js';
-import { DbHelper } from '../helpers/db.js';
-import config from '../config.js';
-import { sortBucketsNewestFirst } from "../helpers/date.js";
+import { S3Helper } from '../helpers/s3.ts';
+import { DbHelper } from '../helpers/db.ts';
+import config from '../config.ts';
+import { sortBucketsNewestFirst } from "../helpers/date.ts";
 
 export default async (dbName) => {
   const dbHelper = new DbHelper();
@@ -16,7 +16,7 @@ export default async (dbName) => {
     const s3Helper = new S3Helper();
 
     const buckets = await s3Helper.getAllBuckets();
-    const dbBuckets = buckets.filter((bucket) => bucket.Name.indexOf(config.dbBackupBucketPrefix) !== -1);
+    const dbBuckets = buckets.filter((bucket) => bucket?.Name?.indexOf(config.dbBackupBucketPrefix) !== -1);
 
     if (!dbBuckets || dbBuckets.length < 1) {
       console.log('no backups found to restore');
@@ -33,17 +33,20 @@ export default async (dbName) => {
     
     await Promise.all(
       objects.map(async (object) => {
-        const collectionNameSplit = object.split('.json');
-        
-        if (collectionNameSplit.length === 2) {
-          const [collectionName] = collectionNameSplit;
-          const objectData = await s3Helper.getObject(latestBlobBucket.Name, object);
-          await dbHelper.deleteCollection(dbName, collectionName);
-          const parsed = JSON.parse(objectData);
-          if (parsed.length > 0) {
-            await dbHelper.addDocumentsToColletion(dbName, collectionName, parsed);
-          }
+        if (object) {
 
+          const collectionNameSplit = object.split('.json');
+          
+          if (collectionNameSplit.length === 2) {
+            const [collectionName] = collectionNameSplit;
+            const objectData = await s3Helper.getObject(latestBlobBucket.Name, object);
+            await dbHelper.deleteCollection(dbName, collectionName);
+            const parsed = JSON.parse(objectData);
+            if (parsed.length > 0) {
+              await dbHelper.addDocumentsToColletion(dbName, collectionName, parsed);
+            }
+  
+          }
         }
       })
     );

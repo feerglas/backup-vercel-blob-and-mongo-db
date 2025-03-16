@@ -4,17 +4,17 @@
 // - if backup is found: make interactive cli, ask if user is really sure
 // that he wants to delete all data and restore from backup
 
-import * as blobHelpers from '../helpers/blob.js';
-import { S3Helper } from '../helpers/s3.js';
-import config from '../config.js';
-import { sortBucketsNewestFirst } from "../helpers/date.js";
+import * as blobHelpers from '../helpers/blob.ts';
+import { S3Helper } from '../helpers/s3.ts';
+import config from '../config.ts';
+import { sortBucketsNewestFirst } from "../helpers/date.ts";
 
 export default async () => {
   try {
     const s3Helper = new S3Helper();
 
     const buckets = await s3Helper.getAllBuckets();
-    const blobBuckets = buckets.filter((bucket) => bucket.Name.indexOf(config.blobBackupBucketPrefix) !== -1);
+    const blobBuckets = buckets.filter((bucket) => bucket?.Name?.indexOf(config.blobBackupBucketPrefix) !== -1);
 
     if (!blobBuckets || blobBuckets.length < 1) {
       console.log('no backups found to restore');
@@ -27,14 +27,18 @@ export default async () => {
     // TODO: make interactive cli, ask if user is really sure
     // that he wants to delete all data and restore from backup
 
+    return;
+
     await blobHelpers.deleteAllBlobs();
 
     const objects = await s3Helper.listObjectsOfBucket(latestBlobBucket.Name);
 
     await Promise.all(
       objects.map(async (object) => {
-        const objectData = await s3Helper.getObject(latestBlobBucket.Name, object);
-        await blobHelpers.addBlob(object, objectData);
+        if (object) {
+          const objectData = await s3Helper.getObject(latestBlobBucket.Name, object);
+          await blobHelpers.addBlob(object, objectData);
+        }
       })
     );
 

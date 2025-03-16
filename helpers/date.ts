@@ -1,4 +1,4 @@
-export const dateString = () => {
+export const dateString = (): string => {
   const date = new Date();
   const year = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(date);
   const month = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(date);
@@ -10,6 +10,7 @@ export const dateString = () => {
   return `${year}${month}${day}-${hours.replace(':', '')}`;
 }
 
+// todo: type buckets
 export const sortBucketsNewestFirst = (buckets) => {
   const sorted = buckets.sort((a, b) => b.CreationDate.getTime() - a.CreationDate.getTime());
 

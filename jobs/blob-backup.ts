@@ -3,10 +3,11 @@
 // - log amount of objects
 
 import { Readable } from 'node:stream';
-import * as blobHelpers from '../helpers/blob.js';
-import { S3Helper } from '../helpers/s3.js';
-import { dateString } from '../helpers/date.js';
-import config from '../config.js';
+import { ReadableStream } from 'node:stream/web';
+import * as blobHelpers from '../helpers/blob.ts';
+import { S3Helper } from '../helpers/s3.ts';
+import { dateString } from '../helpers/date.ts';
+import config from '../config.ts';
 
 export default async () => {
   try {
@@ -18,13 +19,15 @@ export default async () => {
 
     await Promise.all(
       blobs.map(async (blob) => {
-        const res = await fetch(blob.url);
-        if (res.body) {
-          await s3Helper.addObject(
-            bucketName,
-            blob.pathname,
-            Readable.fromWeb(res.body)
-          );
+        if (blob) {
+          const res = await fetch(blob.url);
+          if (res.body) {
+            await s3Helper.addObject(
+              bucketName,
+              blob.pathname,
+              Readable.fromWeb(res.body as ReadableStream)
+            );
+          }
         }
       })
     );

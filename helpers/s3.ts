@@ -8,12 +8,16 @@ import {
   paginateListBuckets,
   GetObjectCommand,
 } from "@aws-sdk/client-s3";
+import type {
+  Bucket,
+  CreateBucketCommandInput,
+} from '@aws-sdk/client-s3';
 import { Upload } from "@aws-sdk/lib-storage";
 
 dotenv.config();
 
 export class S3Helper {
-  client;
+  private client;
 
   constructor() {
     this.client = new S3Client({
@@ -28,8 +32,8 @@ export class S3Helper {
 
   // BUCKETS
 
-  createBucket = async (bucketName) => {  
-    const input = {
+  public createBucket = async (bucketName: string): Promise<void> => {  
+    const input: CreateBucketCommandInput = {
       ACL: "private",
       Bucket: bucketName,
     };
@@ -38,7 +42,7 @@ export class S3Helper {
     await this.client.send(command);
   }
 
-  deleteBucket = async (bucketName) => {
+  public deleteBucket = async (bucketName: string): Promise<void> => {
     await this.deleteAllObjects(bucketName);
 
     const command = new DeleteBucketCommand({
@@ -48,8 +52,8 @@ export class S3Helper {
     await this.client.send(command);
   }
 
-  getAllBuckets = async () => {
-    const buckets = [];
+  public getAllBuckets = async (): Promise<[(Bucket | undefined)?]> => {
+    const buckets: [Bucket?] = [];
 
     const paginator = paginateListBuckets(
       {
@@ -59,7 +63,9 @@ export class S3Helper {
     );
 
     for await (const page of paginator) {
-      buckets.push(...page.Buckets);
+      if (page.Buckets) {
+        buckets.push(...page.Buckets);
+      }
     }
 
     return buckets;
@@ -67,7 +73,8 @@ export class S3Helper {
 
   // OBJECTS
 
-  addObject = async (bucketName, fileName, fileContent) => {
+  // todo type fileContent
+  public addObject = async (bucketName: string, fileName: string, fileContent): Promise<void> => {
     const upload = new Upload({
       client: this.client,
       params: {
@@ -81,7 +88,7 @@ export class S3Helper {
     await upload.done();
   }
 
-  getObject = async (bucketName, fileName) => {
+  public getObject = async (bucketName: string, fileName: string): Promise<string> => {
     const response = await this.client.send(
       new GetObjectCommand({
         Bucket: bucketName,
@@ -94,10 +101,10 @@ export class S3Helper {
     return transformedResult;
   }
 
-  listObjectsOfBucket = async (bucketName) => {
+  public listObjectsOfBucket = async (bucketName: string): Promise<[(string | undefined)?]> => {
 
-    const pageSize = 100;
-    const objects = [];
+    const pageSize = '100';
+    const objects: [string?] = [];
 
     const paginator = paginateListObjectsV2(
       { client: this.client,
@@ -108,20 +115,15 @@ export class S3Helper {
 
     for await (const page of paginator) {
       if (page.Contents) {
-        objects.push(page.Contents.map((o) => o.Key));
+        const pageObjects = page.Contents.map((o) => o.Key);
+        objects.push(...pageObjects);
       }
     }
 
-    let allObjects = [];
-
-    objects.forEach((objectList) => {
-      allObjects = allObjects.concat(objectList);
-    });
-
-    return allObjects;
+    return objects;
   }
 
-  deleteObject = async (bucketName, objectKey) => {
+  public deleteObject = async (bucketName: string, objectKey: string): Promise<void> => {
     const command = new DeleteObjectCommand({
       Bucket: bucketName,
       Key: objectKey
@@ -130,14 +132,15 @@ export class S3Helper {
     await this.client.send(command);
   }
 
-  deleteAllObjects = async (bucketName) => {
+  public deleteAllObjects = async (bucketName: string): Promise<void> => {
     const objects = await this.listObjectsOfBucket(bucketName);
-    const promises = [];
 
-    objects.forEach((object) => {
-      promises.push(this.deleteObject(bucketName, object));
-    })
-
-    await Promise.all(promises);
+    await Promise.all(
+      objects.map(async (object) => {
+        if (object) {
+          await this.deleteObject(bucketName, object);
+        }
+      })
+    );
   }
 }

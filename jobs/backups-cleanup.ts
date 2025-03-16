@@ -1,9 +1,9 @@
 // todo:
 // - log deleted buckets
 
-import { S3Helper } from '../helpers/s3.js';
-import config from '../config.js';
-import { sortBucketsNewestFirst } from '../helpers/date.js';
+import { S3Helper } from '../helpers/s3.ts';
+import config from '../config.ts';
+import { sortBucketsNewestFirst } from '../helpers/date.ts';
 
 const cleanUpBucketsWithPrefix = async (prefix, allBuckets, s3Helper) => {
   const buckets = allBuckets.filter((bucket) => bucket.Name.indexOf(prefix) !== -1);

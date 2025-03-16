@@ -1,45 +1,53 @@
 import dotenv from 'dotenv';
-import{ MongoClient } from 'mongodb';
+import{
+  Db,
+  MongoClient,
+  Collection,
+} from 'mongodb';
 
 dotenv.config();
 
 export class DbHelper {
-  client;
+  private client: MongoClient;
 
   constructor() {
-    this.client = new MongoClient(process.env.DATABASE_URI);
-    this.client.connect();
+    if (process.env.DATABASE_URI) {
+      this.client = new MongoClient(process.env.DATABASE_URI);
+      this.client.connect();
+    }
   }
 
-  getClient = () => {
+  public getClient = (): MongoClient => {
     return this.client;
   }
 
-  getDb = (dbName) => {
+  public getDb = (dbName: string): Db => {
     return this.client.db(dbName);
   }
 
-  getCollections = async (dbName) => {
+  // todo: add return type
+  public getCollections = async (dbName: string) => {
     const db = this.getDb(dbName);
     const collections = await db.collections();
 
     return collections;
   }
 
-  getAllDocumentsOfCollection = async (collection) => {
+  // todo: add return type
+  public getAllDocumentsOfCollection = async (collection: Collection) => {
     const results = await collection.find({}).toArray();
 
     return results;
   }
 
-  deleteCollection = async (dbName, collectionName) => {
+  public deleteCollection = async (dbName, collectionName): Promise<void> => {
     const db = this.getDb(dbName);
 
     await db.collection(collectionName).drop();
 
   }
 
-  deleteAllCollections = async (dbName) => {
+  public deleteAllCollections = async (dbName): Promise<void> => {
     const collections = await this.getCollections(dbName);
 
     for (const collection of collections) {
@@ -49,7 +57,7 @@ export class DbHelper {
     }
   }
 
-  addDocumentsToColletion = async (dbName, collectionName, items) => {
+  public addDocumentsToColletion = async (dbName, collectionName, items): Promise<void> => {
     const db = this.getDb(dbName);
 
     await db.collection(collectionName).insertMany(items);

@@ -4,7 +4,9 @@ import {
   put,
 } from "@vercel/blob";
 
-export const addBlob = async (file, content) => {
+import type { ListBlobResultBlob } from "@vercel/blob";
+
+export const addBlob = async (file: string, content: string): Promise<void> => {
   await put(
     file,
     content,
@@ -15,7 +17,7 @@ export const addBlob = async (file, content) => {
   );
 }
 
-export const deleteAllBlobs = async () => {
+export const deleteAllBlobs = async (): Promise<void> => {
   let cursor;
 
   do {
@@ -33,9 +35,9 @@ export const deleteAllBlobs = async () => {
 
 }
 
-export const getAllBlobs = async () => {
+export const getAllBlobs = async (): Promise<[(ListBlobResultBlob | undefined)?]> => {
   let cursor;
-  let results = [];
+  const results: [ListBlobResultBlob?] = [];
 
   do {
     const listResult = await list({
@@ -44,7 +46,7 @@ export const getAllBlobs = async () => {
     });
 
     if (listResult.blobs.length > 0) {
-      results = results.concat(listResult.blobs);
+      results.push(...listResult.blobs);
     }
 
     cursor = listResult.cursor;
