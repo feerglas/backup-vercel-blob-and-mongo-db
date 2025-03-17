@@ -1,5 +1,5 @@
 {
-  "name": "ovh-os-test",
+  "name": "backup-vercel-blob-and-mongo-db",
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
