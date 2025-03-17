@@ -9,7 +9,7 @@ import { S3Helper } from '../helpers/s3.ts';
 import { dateString } from '../helpers/date.ts';
 import config from '../config.ts';
 
-export default async () => {
+const main = async () => {
   try {
     const s3Helper = new S3Helper();
     const bucketName = `${dateString()}-${config.blobBackupBucketPrefix}`;
@@ -38,3 +38,7 @@ export default async () => {
     console.log(error);
   }
 }
+
+export default main;
+
+main();

@@ -15,7 +15,7 @@ const cleanUpBucketsWithPrefix = async (prefix, allBuckets, s3Helper) => {
   }
 }
 
-export default async () => {
+const main = async () => {
   try {
     const s3Helper = new S3Helper();
     const buckets = await s3Helper.getAllBuckets();
@@ -30,3 +30,7 @@ export default async () => {
     console.log(error);
   }
 }
+
+export default main;
+
+main();

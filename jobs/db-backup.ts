@@ -1,13 +1,12 @@
-// todo:
-// - integrity check: after backup, count objects in db and in backup
-// - log amount of objects
-
+import dotenv from 'dotenv';
 import { S3Helper } from '../helpers/s3.ts';
 import { DbHelper } from '../helpers/db.ts';
 import { dateString } from '../helpers/date.ts';
 import config from '../config.ts';
 
-export default async (dbName) => {
+dotenv.config();
+
+const main = async () => {
   const dbHelper = new DbHelper();
 
   try {
@@ -17,7 +16,13 @@ export default async (dbName) => {
 
     await s3Helper.createBucket(bucketName);
 
-    const collections = await dbHelper.getCollections(dbName);
+    if (!process.env.DATABASE_NAME) {
+      console.log('Aborting. DATABASE_NAME is not defined in env.');
+      
+      return;
+    }
+
+    const collections = await dbHelper.getCollections(process.env.DATABASE_NAME);
 
     for (const collection of collections) {
       const { collectionName } = collection;
@@ -37,3 +42,7 @@ export default async (dbName) => {
     dbHelper.getClient().close();
   }
 }
+
+export default main;
+
+main();

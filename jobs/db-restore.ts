@@ -1,4 +1,5 @@
 import chalk from 'chalk';
+import dotenv from 'dotenv';
 import { S3Helper } from '../helpers/s3.ts';
 import { DbHelper } from '../helpers/db.ts';
 import config from '../config.ts';
@@ -8,7 +9,9 @@ import {
   inquirerAskBucketToRestore
 } from '../helpers/inquirer.ts';
 
-export default async (dbName) => {
+dotenv.config();
+
+const main = async () => {
   const dbHelper = new DbHelper();
 
   try {
@@ -40,6 +43,12 @@ export default async (dbName) => {
       return;
     }
     
+    if (!process.env.DATABASE_NAME) {
+      console.log('Aborting. DATABASE_NAME is not defined in env.');
+      
+      return;
+    }
+
     await Promise.all(
       allObjectsInBucket.map(async (object) => {
         if (object) {
@@ -49,10 +58,10 @@ export default async (dbName) => {
           if (collectionNameSplit.length === 2) {
             const [collectionName] = collectionNameSplit;
             const objectData = await s3Helper.getObject(selectedBucket, object);
-            await dbHelper.deleteCollection(dbName, collectionName);
+            await dbHelper.deleteCollection(process.env.DATABASE_NAME, collectionName);
             const parsed = JSON.parse(objectData);
             if (parsed.length > 0) {
-              await dbHelper.addDocumentsToColletion(dbName, collectionName, parsed);
+              await dbHelper.addDocumentsToColletion(process.env.DATABASE_NAME, collectionName, parsed);
             }
   
           }
@@ -68,3 +77,7 @@ export default async (dbName) => {
     dbHelper.getClient().close();
   }
 }
+
+export default main;
+
+main();

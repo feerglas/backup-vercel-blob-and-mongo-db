@@ -8,7 +8,7 @@ import {
   inquirerAskBucketToRestore
 } from '../helpers/inquirer.ts';
 
-export default async () => {
+const main = async () => {
   try {
 
     const proceedMessage = `Restore blob storage from S3 to Vercel. ${chalk.red('This is a destructive process. All data from Vercel Blob will be deleted in order to restore the data from the S3 Backup')}`;
@@ -66,3 +66,7 @@ export default async () => {
     console.log(chalk.bgRed(error));
   }
 }
+
+export default main;
+
+main();
