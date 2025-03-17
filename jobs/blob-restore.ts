@@ -1,22 +1,22 @@
-// todo:
-// - integrity check: after restore, count objects in blob and in backup
-// - log amount of restored objects
-
+import boxen from 'boxen';
+import chalk from 'chalk';
+import type { Bucket } from '@aws-sdk/client-s3';
 import * as blobHelpers from '../helpers/blob.ts';
 import { S3Helper } from '../helpers/s3.ts';
 import config from '../config.ts';
 import { sortBucketsNewestFirst } from "../helpers/date.ts";
 import inquirer from 'inquirer';
-import type { Bucket } from '@aws-sdk/client-s3';
 
 const inquirerAskForProceed = async (): Promise<Boolean> => {
+  console.log(boxen(`Restore blob storage from S3 to Vercel. ${chalk.red('This is a destructive process. All data from Vercel Blob will be deleted in order to restore the data from the S3 Backup')}`, {padding: 1}));
+
   const answerNo = 'No';
   const answers = await inquirer.prompt(
     [
       {
         type: 'list',
         name: 'proceed',
-        message: 'This is a destructive process. All data from Vercel Blob will be deleted in order to restore the data from the S3 Backup.\nAre you sure you want to continue?',
+        message: 'Are you sure you want to continue?',
         choices: [
           answerNo,
           'Yes',
@@ -111,10 +111,17 @@ export default async () => {
       })
     );
 
-    console.log('-->> Restore done: OVH S3 to Vercel blob data');
+    // integrity check: check if all data was restored
+    const newBlobs = await blobHelpers.getAllBlobs();
+
+    if (newBlobs.length !== allObjectsInBucket.length) {
+      throw new Error('Integrity fail: it seems that not all objects from S3 were restored to Vercel blob.');
+    }
+
+    console.log(chalk.bgGreen('-->> Restore done: OVH S3 to Vercel blob data'));
 
 
   } catch (error) {
-    console.log(error);
+    console.log(chalk.bgRed(error));
   }
 }
