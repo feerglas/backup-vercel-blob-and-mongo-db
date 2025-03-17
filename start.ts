@@ -26,7 +26,7 @@ import backupsCleanup from './jobs/backups-cleanup.ts';
 // disaster recovery script 1: blob-restore
 // get blob data backup from s3 (ovh) and save to blob data (vercel)
 import blobRestore from './jobs/blob-restore.ts';
-blobRestore();
+// blobRestore();
 
 
 
