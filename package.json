@@ -4,11 +4,11 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "backup:blob": "ts-node ./jobs/blob-backup.ts",
-    "backup:db": "ts-node ./jobs/db-backup.ts",
-    "backup:cleanup": "ts-node ./jobs/backups-cleanup.ts",
-    "restore:blob": "ts-node ./jobs/blob-restore.ts",
-    "restore:db": "ts-node ./jobs/db-restore.ts"
+    "backup:blob": "ts-node ./cron-jobs/blob-backup.ts",
+    "backup:db": "ts-node ./cron-jobs/db-backup.ts",
+    "backup:cleanup": "ts-node ./cron-jobs/backups-cleanup.ts",
+    "restore:blob": "ts-node ./restores/blob-restore.ts",
+    "restore:db": "ts-node ./restores/db-restore.ts"
   },
   "author": "",
   "license": "ISC",

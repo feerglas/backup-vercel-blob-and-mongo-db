@@ -7,6 +7,17 @@ import config from '../config.ts';
 dotenv.config();
 
 const main = async () => {
+  /*
+  // If run as cron-job on vercel, make sure that only cron-jobs can execute
+  // the script.
+  const authHeader = request.headers.get("authorization");
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return new Response("Unauthorized", {
+      status: 401,
+    });
+  }
+  */
+
   const dbHelper = new DbHelper();
 
   try {

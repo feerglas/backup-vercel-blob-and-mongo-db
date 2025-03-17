@@ -19,7 +19,6 @@ Restore blob and restore db are meant to be executed on demand and triggered loc
 `npm run backup:blob`
 
 get all blob data (vercel) and save to s3 (ovh)
-./jobs/blob-backup.ts
 
 
 ### cron job 2: db backup
@@ -27,31 +26,24 @@ get all blob data (vercel) and save to s3 (ovh)
 `npm run backup:db`
 
 make db-dump (ovh) and save to s3 (ovh)
-./jobs/db-backup.ts
-
 
 ### cron job 3: backups cleanup
 
 `npm run backup:cleanup`
 
 delete old blob-backups and db-backups
-./jobs/backups-cleanup.ts
-
 
 ### disaster recovery script 1: blob restore
 
 `npm run restore:blob`
 
 get blob data backup from s3 (ovh) and save to blob data (vercel)
-./jobs/blob-restore.ts
-
 
 ### disaster recovery script 2: db restore
 
 `npm run restore:db`
 
 get db-backup from s3 (ovh) and save to mongoDb (ovh)
-./jobs/db-restore.ts
 
 ## Todo
 - Send mail on failure
