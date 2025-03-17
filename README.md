@@ -10,9 +10,8 @@ To run the jobs locally, make sure to copy `.env.example` to `.env` and fill in 
 
 These jobs are available as npm scripts.
 
-Ideally, blob backup, db backup und backups cleanup should be run as cron jobs on a regular basis.
-
-Restore blob and restore db are meant to be executed on demand and triggered locally.
+- Ideally, blob backup, db backup und backups cleanup should be run as cron jobs on a regular basis.
+- Restore blob and restore db are meant to be executed on demand and triggered locally.
 
 ### cron job 1: blob backup
 

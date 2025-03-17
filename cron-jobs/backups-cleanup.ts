@@ -1,3 +1,5 @@
+// Ideally executed as cron-job.
+
 // todo:
 // - log deleted buckets
 

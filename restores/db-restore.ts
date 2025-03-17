@@ -1,3 +1,5 @@
+// Should be triggered manually.
+
 import chalk from 'chalk';
 import dotenv from 'dotenv';
 import { S3Helper } from '../helpers/s3.ts';

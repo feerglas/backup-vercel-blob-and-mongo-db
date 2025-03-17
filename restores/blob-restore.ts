@@ -1,3 +1,5 @@
+// Should be triggered manually.
+
 import chalk from 'chalk';
 import * as blobHelpers from '../helpers/blob.ts';
 import { S3Helper } from '../helpers/s3.ts';

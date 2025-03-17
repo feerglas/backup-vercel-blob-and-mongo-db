@@ -1,3 +1,5 @@
+// Ideally executed as cron-job.
+
 import dotenv from 'dotenv';
 import { S3Helper } from '../helpers/s3.ts';
 import { DbHelper } from '../helpers/db.ts';

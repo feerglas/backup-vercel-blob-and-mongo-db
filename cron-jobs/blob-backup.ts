@@ -1,3 +1,5 @@
+// Ideally executed as cron-job.
+
 // todo:
 // - integrity check: after backup, count objects in blob and in backup
 // - log amount of objects
