@@ -1,15 +1,12 @@
 // Ideally executed as cron-job.
 
-// todo:
-// - integrity check: after backup, count objects in blob and in backup
-// - log amount of objects
-
 import { Readable } from 'node:stream';
 import { ReadableStream } from 'node:stream/web';
 import * as blobHelpers from '../helpers/blob.ts';
 import { S3Helper } from '../helpers/s3.ts';
 import { dateString } from '../helpers/date.ts';
 import config from '../config.ts';
+import mail from '../helpers/mail.ts';
 
 const main = async () => {
   /*
@@ -45,9 +42,30 @@ const main = async () => {
       })
     );
 
-    console.log('-->> Backup done: Vercel Blob data to OVH S3');
+    // integrity check
+    const bucketItemsCount = await s3Helper.listObjectsOfBucket(bucketName);
+
+    if (bucketItemsCount.length !== blobs.length) {
+      throw new Error(`Blob Backup failure during integrity check. Vercel blob has ${blobs.length} objects, but the backup contains ${bucketItemsCount.length}`);
+    }
+
+    const mailMessage = `Successfully backed up ${blobs.length} items from Vercel Blob to OVH S3`;
+
+    await mail(
+      '--> Backup done: Vercel Blob data to OVH S3',
+      mailMessage,
+      false,
+    );
+
+    console.log(mailMessage);
 
   } catch (error) {
+    await mail(
+      '--> Backup failure: Vercel Blob data to OVH S3',
+      error,
+      true,
+    );
+
     console.log(error);
   }
 }

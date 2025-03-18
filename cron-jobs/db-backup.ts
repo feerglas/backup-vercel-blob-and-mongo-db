@@ -5,6 +5,7 @@ import { S3Helper } from '../helpers/s3.ts';
 import { DbHelper } from '../helpers/db.ts';
 import { dateString } from '../helpers/date.ts';
 import config from '../config.ts';
+import mail from '../helpers/mail.ts';
 
 dotenv.config();
 
@@ -30,26 +31,40 @@ const main = async () => {
     await s3Helper.createBucket(bucketName);
 
     if (!process.env.DATABASE_NAME) {
-      console.log('Aborting. DATABASE_NAME is not defined in env.');
-      
-      return;
+      throw new Error('Aborting. DATABASE_NAME is not defined in env.');
     }
 
     const collections = await dbHelper.getCollections(process.env.DATABASE_NAME);
+    let collectionBackupCount = 0;
 
     for (const collection of collections) {
       const { collectionName } = collection;
 
       if (!collectionName.startsWith('system.')) {
+        collectionBackupCount++;
         const results = await collection.find({}).toArray();
 
         await s3Helper.addObject(bucketName, `${collectionName}.json`, JSON.stringify(results));
       }
     }
 
-    console.log('-->> Backup done: DB on OVH to OVH S3');
+    const mailMessage = `Successfully backed up ${collectionBackupCount} colletions from MongoDb to OVH S3`;
+
+    await mail(
+      '-->> Backup done: DB on OVH to OVH S3',
+      mailMessage,
+      false,
+    );
+
+    console.log(mailMessage);
 
   } catch (error) {
+    await mail(
+      '--> Backup failure: DB on OVH to OVH S3',
+      error,
+      true,
+    );
+
     console.log(error);
   } finally {
     dbHelper.getClient().close();
