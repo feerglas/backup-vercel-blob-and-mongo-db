@@ -62,4 +62,11 @@ export class DbHelper {
 
     await db.collection(collectionName).insertMany(items);
   }
+
+  // todo: add return type
+  public getContentOfCollection = async (collection: Collection): Promise<any> => {
+    const results = await collection.find({}).toArray();
+
+    return results;
+  }
 }

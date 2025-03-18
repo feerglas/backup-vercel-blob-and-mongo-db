@@ -1,6 +1,7 @@
 // Ideally executed as cron-job.
 
 import dotenv from 'dotenv';
+import { EJSON } from 'bson';
 import { S3Helper } from '../helpers/s3.ts';
 import { DbHelper } from '../helpers/db.ts';
 import { dateString } from '../helpers/date.ts';
@@ -42,9 +43,9 @@ const main = async () => {
 
       if (!collectionName.startsWith('system.')) {
         collectionBackupCount++;
-        const results = await collection.find({}).toArray();
+        const results = await dbHelper.getContentOfCollection(collection);
 
-        await s3Helper.addObject(bucketName, `${collectionName}.json`, JSON.stringify(results));
+        await s3Helper.addObject(bucketName, `${collectionName}.json`, EJSON.stringify(results));
       }
     }
 

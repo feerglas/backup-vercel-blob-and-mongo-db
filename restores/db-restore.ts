@@ -2,6 +2,7 @@
 
 import chalk from 'chalk';
 import dotenv from 'dotenv';
+import { EJSON } from 'bson';
 import { S3Helper } from '../helpers/s3.ts';
 import { DbHelper } from '../helpers/db.ts';
 import config from '../config.ts';
@@ -61,7 +62,8 @@ const main = async () => {
             const [collectionName] = collectionNameSplit;
             const objectData = await s3Helper.getObject(selectedBucket, object);
             await dbHelper.deleteCollection(process.env.DATABASE_NAME, collectionName);
-            const parsed = JSON.parse(objectData);
+
+            const parsed = EJSON.parse(objectData);
             if (parsed.length > 0) {
               await dbHelper.addDocumentsToColletion(process.env.DATABASE_NAME, collectionName, parsed);
             }
